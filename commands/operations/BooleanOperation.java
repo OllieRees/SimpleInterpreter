@@ -20,49 +20,31 @@ public class BooleanOperation extends Operation<Boolean> {
 	
 	private static final List<String> booleanOperationValues = new ArrayList<>(Arrays.asList("!", "==", "!=", "<", "<=", ">", ">="));
 	
-	public BooleanOperation(List<Variable> parameters) throws InvalidArgumentAmountException, InvalidArgumentTypeException {
-		super(parameters);
-		checkOperationType(parameters);
-		checkUnaryOperandType(parameters);
-		checkNumericOperationsType(parameters);
-		this.execute();
-	}
-		
-	/** Checks whether the operations are represented as {@link StringVariable}.
-	 * 
-	 * @param parameters of the operation
-	 * @throws InvalidArgumentTypeException if the operation isn't a string
-	 */
-	private void checkOperationType(List<Variable> parameters) throws InvalidArgumentTypeException {
-		if(parameters.size() == 3)
-			if( !(parameters.get(1) instanceof StringVariable) )
-				throw new InvalidArgumentTypeException("Operation", "String Variable");
-		if(parameters.size() == 2)
-			if( !(parameters.get(0) instanceof StringVariable) )
-				throw new InvalidArgumentTypeException("Operation", "String Variable");
+	public BooleanOperation(String parameter, String operation) throws InvalidArgumentAmountException, InvalidArgumentTypeException {
+		super(parameter, operation);
+		checkUnaryOperandType();
+		checkNumericOperationsType();
 	}
 	
 	/** Checks whether the operand for the unary operation, !, is {@link BooleanVariable}.
 	 * 
-	 * @param parameters of the opreation
 	 * @throws InvalidArgumentTypeException if the operand isn't boolean
 	 */
-	private void checkUnaryOperandType(List<Variable> parameters) throws InvalidArgumentTypeException {
-		if(parameters.size() == 2)
-			if( !(parameters.get(1) instanceof BooleanVariable) )
-				throw new InvalidArgumentTypeException("Operand for unary Boolean Operation", "Boolean Variable");
+	private void checkUnaryOperandType() throws InvalidArgumentTypeException {
+		if(super.getLhs() == null)
+			if( !(super.getRhs() instanceof BooleanVariable) )
+				throw new InvalidArgumentTypeException("Left-hand side for the unary boolean operation (!) should be boolean type");
 	}
 	
 	/** Checks whether the operands are {@link NumberVariable} for operations <, >, <= and >=
 	 * 
-	 * @param parameters of the operation
 	 * @throws InvalidArgumentTypeException if the operands aren't numbers.
 	 */
-	private void checkNumericOperationsType(List<Variable> parameters) throws InvalidArgumentTypeException {
-		if(parameters.size() == 3)
-			if( !parameters.get(1).equals("==") || !parameters.get(1).equals("!=") )
-				if(parameters.get(0) instanceof NumberVariable && parameters.get(1) instanceof NumberVariable)
-					throw new InvalidArgumentTypeException("Operand for <, >, <= and >=", "Numeric Variable");
+	private void checkNumericOperationsType() throws InvalidArgumentTypeException {
+		if(super.getLhs() != null)
+			if( !(super.getOperation().getValue().equals("==") || super.getOperation().getValue().equals("!=")) )
+				if( !(super.getLhs() instanceof NumberVariable && super.getRhs() instanceof NumberVariable) )
+					throw new InvalidArgumentTypeException("Both operands should be numbers for the boolean operations >, <, >= and <=");
 	}
 	
 	/** Gets the different boolean operations
@@ -75,48 +57,45 @@ public class BooleanOperation extends Operation<Boolean> {
 	
 	/** Gets the result of the operation
 	 * 
-	 * @return the {@link Boolean} result
+	 * @return the {@link BooleanVariable} result
 	 */
-	public Boolean getResult() {
+	public Variable<Boolean> getResult() {
 		return super.getResult();
 	}
 	
-	/** Assess the variables
+	/** Assess the variables, producing a result.
 	 * 
 	 */
 	@Override
-	public void execute() {
-		super.getParameters();
+	public void assess() {
 		Boolean newResult;
-		
-		//determine operation
-		String operation = super.getParameters().size() == 3 ? super.getParameters().get(1).toString() : super.getParameters().get(0).toString();
-			switch(operation) {
+			
+			switch(super.getOperation().getValue()) {
 				case "!":
-					newResult = !(super.getParameters().get(1).getValue().equals(super.getParameters().get(1).getValue()));
+					newResult = !((Boolean) super.getRhs().getValue());
 					break;
 				case "==":
-					newResult = super.getParameters().get(0).getValue().equals(super.getParameters().get(2).getValue());
+					newResult = super.getLhs().getValue().equals(super.getRhs().getValue());
 					break;
 				case "!=":
-					newResult = !super.getParameters().get(0).getValue().equals(super.getParameters().get(2).getValue());
+					newResult = !super.getLhs().getValue().equals(super.getRhs().getValue());
 					break;
 				case "<":
-					newResult = ((Double) super.getParameters().get(0).getValue()) < ((Double) super.getParameters().get(2).getValue());
+					newResult = ((Number) super.getLhs().getValue()).doubleValue() < ((Number) super.getRhs().getValue()).doubleValue();
 					break;
 				case ">":
-					newResult = ((Double) super.getParameters().get(0).getValue()) > ((Double) super.getParameters().get(2).getValue());
+					newResult = ((Number) super.getLhs().getValue()).doubleValue() > ((Number) super.getRhs().getValue()).doubleValue();
 					break;
 				case "<=":
-					newResult = ((Double) super.getParameters().get(0).getValue()) <= ((Double) super.getParameters().get(2).getValue());
+					newResult = ((Number) super.getLhs().getValue()).doubleValue() <= ((Number) super.getRhs().getValue()).doubleValue();
 					break;
 				case ">=":
-					newResult = ((Double) super.getParameters().get(0).getValue()) >= ((Double) super.getParameters().get(2).getValue());
+					newResult = ((Number) super.getLhs().getValue()).doubleValue() >= ((Number) super.getRhs().getValue()).doubleValue();
 					break;
 				default:
 					newResult = null;
 					break;
 			}
-		super.setResult(newResult);	
+		super.setResult(new BooleanVariable(null, newResult));	
 	}
 }

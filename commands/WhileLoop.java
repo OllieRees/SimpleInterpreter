@@ -24,16 +24,9 @@ public class WhileLoop extends Command {
 		super(parameters);
 		if(parameters.size() != 1)
 			throw new InvalidArgumentAmountException("while", 1);
-		setTerminatingConditions(parameters);
 	}
 	
 	private void setTerminatingConditions(List<Variable> parameters) throws InvalidArgumentTypeException {
-		//should be boolean or infix boolean (var1 BoolOperator var2)
-		BooleanOperation boolOp = new BooleanOperation(parameters);
-		if( !(parameters.get(0) instanceof BooleanVariable) || boolOp == null )
-			throw new InvalidArgumentTypeException("boolean");
-		
-		this.terminatingCondition = boolOp;
 	}
 			
 	

@@ -8,7 +8,6 @@ public class If extends Command {
 
 	public If(List<Variable> parameters) throws InvalidArgumentAmountException {
 		super(parameters);
-		
 	}
 
 	@Override

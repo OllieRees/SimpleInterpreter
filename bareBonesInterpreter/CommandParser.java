@@ -19,10 +19,6 @@ public class CommandParser {
 	
 	private static VariableStore vs = new VariableStore();
 	
-	public static Command getNextCommand() {
-		return determineCommand(FileParser.readNextLine());
-	}
-	
 	private static String removePreceedingSpaces(String line) {
 		String regex = ("^[ \\t]+");
 		return line.replaceAll(regex, "");
@@ -56,7 +52,7 @@ public class CommandParser {
 	 * @param cmdLine the line being checked
 	 * @return the parameters as {@link Variable variables}
 	 */
-	private static List<Variable> getParameters(String cmdLine) {
+	public static List<Variable> getParameters(String cmdLine) {
 		List<Variable> parameters = new ArrayList<>();
 		
 		//get the arguments in the parentheses
@@ -72,8 +68,7 @@ public class CommandParser {
 			//remove any preceeding + proceeding spaces
 			para = removePreceedingSpaces(para) == null ? para : removePreceedingSpaces(para);
 			para = removeProceedingSpaces(para) == null ? para : removeProceedingSpaces(para);
-			Variable var = CommandParser.determineParameter(para);
-			parameters.add(var);
+			parameters.add(CommandParser.determineParameter(para));
 		}
 		
 		return parameters;
@@ -84,7 +79,7 @@ public class CommandParser {
 	 * @param parameter is the string being checked
 	 * @return the Variable according to the parameter's features.
 	 */
-	private static Variable determineParameter(String parameter) {
+	public static Variable determineParameter(String parameter) {
 		//is a variable
 		if(vs.getVariable(parameter) != null) {
 			return vs.getVariable(parameter);
@@ -103,12 +98,19 @@ public class CommandParser {
 		if(parameter.equals("FALSE")) 
 			return new BooleanVariable(null, false);
 		
-		
 		//check if parameter is an infix operation
+		Operation infixOperator;
+		if((infixOperator = CommandParser.determineInfixOperation(parameter)) != null) {
+			infixOperator.assess();
+			return infixOperator.getResult();
+		}
 		
 		//is string
 		String strVal = parameter.replaceAll("\"", "");
-		return new StringVariable(null, strVal);
+		if(!strVal.equals(""))
+			return new StringVariable(null, strVal);
+		
+		return null;
 	}
 	
 	/** Determines any commands with infix operators (aka {@link Operation})
@@ -116,15 +118,11 @@ public class CommandParser {
 	 * @param parameters the parameters of the operation
 	 * @return the {@link Operation} 
 	 */
-	public static Operation determineInfixOperation(List<Variable> parameters) {
+	private static Operation determineInfixOperation(String parameter) {
 		/*Check boolean infix */
-		//Not very efficient 
-		for(String op : BooleanOperation.getBooleanOperationValues()) {
-			if(parameters.size() == 1)
-				if(parameters.get(0) instanceof StringVariable)
-					if( ((String) parameters.get(0).getValue()).contains(op))
-						return new BooleanOperation(parameters);
-		}
+		for(String op : BooleanOperation.getBooleanOperationValues())
+			if(parameter.contains(op))
+				return new BooleanOperation(parameter, op);
 			
 		//if it wasn't an operation
 		return null;
@@ -136,7 +134,7 @@ public class CommandParser {
 	 * @param cmdLine the line with the command
 	 * @return the {@link Command} that is being invoked in the line. If no command is being invoked, or the command is invalid, then null is returned.
 	 */
-	public static Command determineCommand(String cmdLine) throws InvalidArgumentAmountException, InvalidArgumentTypeException{
+	public static Command determineCommand(String cmdLine) throws InvalidArgumentAmountException, InvalidArgumentTypeException {
 		String cmd = CommandParser.getCommandString(cmdLine);
 		if(cmd == null)
 			return null;

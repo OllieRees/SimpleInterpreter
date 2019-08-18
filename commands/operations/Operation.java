@@ -2,28 +2,49 @@ package commands.operations;
 
 import java.util.List;
 
-import commands.Command;
-import commands.InvalidArgumentAmountException;
+import bareBonesInterpreter.CommandParser;
 import commands.InvalidArgumentTypeException;
+import variables.StringVariable;
 import variables.Variable;
 
-public abstract class Operation<E> extends Command {
+public abstract class Operation<E> {
 
-	private E result;
+	private Variable<E> result;
+	private StringVariable operation;
+	private Variable lhs;
+	private Variable rhs;
 	
-	public Operation(List<Variable> parameters) throws InvalidArgumentAmountException {
-		super(parameters);
-		if(parameters.size() == 3)
-			if( !(parameters.get(0).getValue().equals( parameters.get(2).getValue() ) ) )
-				throw new InvalidArgumentTypeException("Operands should be the same value");
+	public Operation(String parameter, String operation) throws InvalidArgumentTypeException {
+		this.operation = new StringVariable(null, operation);
+		String[] operands = parameter.split(this.operation.getValue());	
+		this.lhs = CommandParser.determineParameter(operands[0]);
+		this.rhs = CommandParser.determineParameter(operands[1]);
+				
+		if( !(this.lhs == null || this.rhs == null))
+			if(lhs.getClass() != rhs.getClass())
+				throw new InvalidArgumentTypeException("The operands of the operation should be the same type");
 	}
 	
-	public E getResult() {
+	public StringVariable getOperation() {
+		return this.operation;
+	}
+	
+	public Variable getLhs() {
+		return this.lhs;
+	}
+	
+	public Variable getRhs() {
+		return this.rhs;
+	}
+	
+	public Variable<E> getResult() {
 		return this.result;
 	}
 	
-	public void setResult(E newResult) {
+	public void setResult(Variable<E> newResult) {
 		this.result = newResult;
 	}
+	
+	public abstract void assess();
 	
 }
