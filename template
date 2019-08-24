@@ -1,0 +1,11 @@
+GET (A) -- Gets the value of variable A. Gives an error message if A doesn't exist
+SET (A, B) -- Sets the value of A to B. This can either create A as a variable with value B, or replaces the value of A with B's value.
+ADD (A, B, C) -- A's value is now equal to B + C. B and C must be numbers or variables holding numbers. A must be a variable holding a number or the name of a new variable.
+SUB (A, B, C) -- A's value is now equal to B - C. B and C must be numbers or variables holding numbers. A must be a variable holding a number or the name of a new variable.
+!A -- A must be a boolean value, and it negates the value of A's value
+A == B -- Returns true if A's value and B's value are equal.
+A != B -- Returns true if A's value is different to B's value.
+A < B -- A and B must be a number. Returns true if A is less than B.
+A > B -- A and B must be a number. Returns true if A is greater than B.
+A <= B -- A and B must be a number. Returns true if A is less than or equal to B.
+A >= B -- A and B must be a number. Returns true if A is greater than or equal to B.
