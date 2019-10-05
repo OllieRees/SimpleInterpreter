@@ -2,11 +2,11 @@ package commands;
 
 import java.util.List;
 
-import variables.Variable;
+import parameter.Parameter;
 
 public class End extends Command {
-
-	public End(List<Variable> parameters) throws InvalidArgumentAmountException {
+	
+	public End(List<Parameter> parameters) throws InvalidArgumentAmountException {
 		super(parameters);
 	}
 

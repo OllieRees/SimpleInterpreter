@@ -3,8 +3,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import variables.Variable;
-
 public class BareBonesInterpreter {
 
 	public static void main(String[] args) {

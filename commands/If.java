@@ -2,18 +2,21 @@ package commands;
 
 import java.util.List;
 
-import variables.Variable;
+import command.scope.ScopedCommand;
+import parameter.Parameter;
 
-public class If extends Command {
-
-	public If(List<Variable> parameters) throws InvalidArgumentAmountException {
+public class If extends ScopedCommand {
+	
+	public If(List<Parameter> parameters) throws InvalidArgumentAmountException, InvalidArgumentTypeException {
 		super(parameters);
+		this.execute();
 	}
 
 	@Override
 	public void execute() {
-		// TODO Auto-generated method stub
-
+		super.updateCondition();
+		if(super.getConditionResult()) {
+			super.executeScope();
+		}
 	}
-
 }

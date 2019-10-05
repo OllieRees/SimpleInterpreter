@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import variables.NumberVariable;
-import variables.Variable;
+import parameter.Parameter;
+import parameter.operations.Operation;
+import parameter.variables.NumberVariable;
+import parameter.variables.Variable;
 
 public class Sub extends Command {
 
@@ -13,15 +15,17 @@ public class Sub extends Command {
 	private Number operand_l;
 	private Number operand_r;
 	
-	public Sub(List<Variable> parameters) throws InvalidArgumentAmountException {
+	public Sub(List<Parameter> parameters) throws InvalidArgumentAmountException {
 		super(parameters);
 		if(parameters.size() != 3) 
 			throw new InvalidArgumentAmountException("sub", 3);
-		
+		if( !(parameters.get(0) instanceof Variable) )
+			throw new InvalidArgumentTypeException("Store variable, in Sub, should be a variable.");	
 		checkParameters(parameters);
-		this.storeVar = (NumberVariable) parameters.get(0);
-		this.operand_l = (Number) parameters.get(1).getValue();
-		this.operand_r = (Number) parameters.get(2).getValue();
+		
+		this.storeVar = (Variable) parameters.get(0);
+		this.operand_l = ((NumberVariable) parameters.get(1)).getValue();
+		this.operand_r = ((NumberVariable) parameters.get(2)).getValue();
 	}
 	
 	/** Checks if the parameters are {@link NumberVariable} variables.
@@ -29,7 +33,7 @@ public class Sub extends Command {
 	 * @param the parameters of {@link Add}.
 	 * @throws InvalidArgumentTypeException if one of the parameters isn't a number variable.
 	 */
-	private void checkParameters(List<Variable> parameters) throws InvalidArgumentTypeException  {
+	private void checkParameters(List<Parameter> parameters) throws InvalidArgumentTypeException  {
 		if( !(parameters.get(1) instanceof NumberVariable) && !(parameters.get(2) instanceof NumberVariable) ) {
 			throw new InvalidArgumentTypeException("Last two parameters for Sub should be Number Variables");
 		}
@@ -37,7 +41,7 @@ public class Sub extends Command {
 
 	@Override
 	public void execute() {
-		List<Variable> parameters = new ArrayList<>(Arrays.asList(storeVar, new NumberVariable(null, operand_l.doubleValue() - operand_r.doubleValue())));
+		List<Parameter> parameters = new ArrayList<>(Arrays.asList(storeVar, new NumberVariable(null, operand_l.doubleValue() - operand_r.doubleValue())));
 		(new Set(parameters)).execute();	
 	}
 }

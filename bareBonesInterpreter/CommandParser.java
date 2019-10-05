@@ -2,13 +2,12 @@ package bareBonesInterpreter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import commands.*;
-import commands.operations.BooleanOperation;
-import commands.operations.Operation;
-import variables.*;
+import parameter.Parameter;
+import parameter.operations.BooleanOperation;
+import parameter.operations.Operation;
+import parameter.variables.*;
 
 /** Parses commands: intermediary between {@link Command} and {@link FileReader}
  * 
@@ -29,12 +28,20 @@ public class CommandParser {
 		return line.replaceAll(regex, "");
 	}
 	
+	public static Command getNextCommand() {
+		String nextLine = FileParser.readNextLine();
+		if(nextLine != null)
+			return CommandParser.determineCommand(nextLine);
+		return null;
+	}
+	
 	/** Get the command title from the line 
 	 * 
 	 * @param cmdLine the line with the command title
 	 * @return the command title as it is.
 	 */
 	private static String getCommandString(String cmdLine) {
+		
 		//check if there are any arguments
 		int startIndex = cmdLine.indexOf("(");
 		if(startIndex == -1)
@@ -52,26 +59,26 @@ public class CommandParser {
 	 * @param cmdLine the line being checked
 	 * @return the parameters as {@link Variable variables}
 	 */
-	public static List<Variable> getParameters(String cmdLine) {
-		List<Variable> parameters = new ArrayList<>();
+	public static List<Parameter> getParameters(String cmdLine) {
+		List<Parameter> parameters = new ArrayList<>();
 		
+		String[] params = getParameterStrings(cmdLine);
+		
+		for (String para  : params) 
+			parameters.add(CommandParser.determineParameter(para));
+		
+		return parameters;
+	}
+	
+	private static String[] getParameterStrings(String cmdLine) {
 		//get the arguments in the parentheses
 		if(cmdLine.indexOf(")") == -1)
 			return null;
 		String paramStr = cmdLine.substring(cmdLine.indexOf("("), cmdLine.indexOf(")"));
 		paramStr = paramStr.replace("(", "");
-		
+
 		//split by the comma
-		String[] params = paramStr.split(",");
-		
-		for (String para  : params) {
-			//remove any preceeding + proceeding spaces
-			para = removePreceedingSpaces(para) == null ? para : removePreceedingSpaces(para);
-			para = removeProceedingSpaces(para) == null ? para : removeProceedingSpaces(para);
-			parameters.add(CommandParser.determineParameter(para));
-		}
-		
-		return parameters;
+		return paramStr.split(",");
 	}
 	
 	/** Determines the {@link Variable} type based on the contents of the String
@@ -79,7 +86,12 @@ public class CommandParser {
 	 * @param parameter is the string being checked
 	 * @return the Variable according to the parameter's features.
 	 */
-	public static Variable determineParameter(String parameter) {
+	public static Parameter determineParameter(String parameter) {
+		
+		//string formatting: remove preceeding and proceeding spaces.
+		parameter = removePreceedingSpaces(parameter) == null ? parameter : removePreceedingSpaces(parameter);
+		parameter = removeProceedingSpaces(parameter) == null ? parameter : removeProceedingSpaces(parameter);
+		
 		//is a variable
 		if(vs.getVariable(parameter) != null) {
 			return vs.getVariable(parameter);
@@ -101,8 +113,7 @@ public class CommandParser {
 		//check if parameter is an infix operation
 		Operation infixOperator;
 		if((infixOperator = CommandParser.determineInfixOperation(parameter)) != null) {
-			infixOperator.assess();
-			return infixOperator.getResult();
+			return infixOperator;
 		}
 		
 		//is string
@@ -139,7 +150,7 @@ public class CommandParser {
 		if(cmd == null)
 			return null;
 		
-		List<Variable> parameters = CommandParser.getParameters(cmdLine);	
+		List<Parameter> parameters = CommandParser.getParameters(cmdLine);	
 		
 		switch(cmd) {
 			case "set": 

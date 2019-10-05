@@ -1,8 +1,9 @@
-package variables;
+package parameter.variables;
 
 import bareBonesInterpreter.CommandParser;
+import parameter.Parameter;
 
-public abstract class Variable<E> {
+public abstract class Variable<E> implements Parameter {
 	
 	private String varName;
 	private E varValue;

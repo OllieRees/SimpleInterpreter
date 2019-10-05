@@ -1,4 +1,4 @@
-package commands.operations;
+package parameter.operations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,10 +6,9 @@ import java.util.List;
 
 import commands.InvalidArgumentAmountException;
 import commands.InvalidArgumentTypeException;
-import variables.BooleanVariable;
-import variables.NumberVariable;
-import variables.StringVariable;
-import variables.Variable;
+import parameter.variables.BooleanVariable;
+import parameter.variables.NumberVariable;
+import parameter.variables.Variable;
 
 /** Operations that assess two Variables and produce a Boolean result
  * 
@@ -18,7 +17,7 @@ import variables.Variable;
  */
 public class BooleanOperation extends Operation<Boolean> {
 	
-	private static final List<String> booleanOperationValues = new ArrayList<>(Arrays.asList("!", "==", "!=", "<", "<=", ">", ">="));
+	private static final List<String> booleanOperationValues = new ArrayList<>(Arrays.asList("!", "==", "!=", "<=", ">=", "<", ">"));
 	
 	public BooleanOperation(String parameter, String operation) throws InvalidArgumentAmountException, InvalidArgumentTypeException {
 		super(parameter, operation);
